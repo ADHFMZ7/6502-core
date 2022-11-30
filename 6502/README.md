@@ -5,6 +5,8 @@ This is an implementation of a 6502 emulator written in python.
 
 ## Instruction set
 
+The 6502 instruction set consists of 56 different operations.
+
 
 
 ## Resources
@@ -12,3 +14,4 @@ This is an implementation of a 6502 emulator written in python.
 - [Datasheet](https://www.princeton.edu/~mae412/HANDOUTS/Datasheets/6502.pdf)
 - [instructions](https://www.cs.otago.ac.nz/cosc243/pdf/6502Poster.pdf)
 - [Masswerk](https://www.masswerk.at/6502/6502_instruction_set.html#ADC)
+- [Opcodes](http://www.6502.org/tutorials/6502opcodes.html)
