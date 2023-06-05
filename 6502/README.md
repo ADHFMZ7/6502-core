@@ -3,6 +3,19 @@
 The [6502 microprocessor](https://en.wikipedia.org/wiki/MOS_Technology_6502) is an 8-bit microprocessor.
 This is an implementation of a 6502 emulator written in python.
 
+## Registers
+8-bit:
+- A register: Accumulator
+- X register
+- Y register
+- stkp: stack pointer
+- status: status register
+16-bit:
+- pc: program counter
+
+
+
+
 ## Instruction set
 
 The 6502 instruction set consists of 56 different operations.
