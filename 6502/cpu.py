@@ -1,5 +1,3 @@
-
-
 C = 1  # Carry
 Z = 2  # Zero
 I = 4  # Interrupt Disable
@@ -19,16 +17,99 @@ class CPU:
         self.stkp = 0
         self.pc = 0
         self.status = 0
+        self.data = 0
 
     def reset(self):
         pass 
 
-    def ADC(self):
+    def irq(self):
         pass
+    
+    def nmi(self):
+        pass
+    
+    def fetch(self):
+        pass
+    
+    def clock(self):
+        pass
+    
+    def read(self, address):
+        pass
+    
+    def write(self, address, data):
+        pass
+    
+    
+    def set_flag(self, flag, val):
+        if val:
+            self.status |= flag
+        else:
+            self.status &= ~flag
+      
+    def get_flag(self, flag):
+        return (self.status & flag) > 0  
+
+
+    # Addressing Modes
+    def IMP(self):
+        pass
+    
+    def IMM(self):
+        pass
+    
+    def ZP0(self):
+        pass
+    
+    def ZPX(self):
+        pass
+    
+    def ZPY(self):
+        pass
+    
+    def REL(self):
+        pass
+    
+    def ABS(self):
+        pass
+    
+    def ABX(self):
+        pass
+    
+    def ABY(self):
+        pass
+    
+    def IND(self):
+        pass
+    
+    def IZX(self):
+        pass
+    
+    def IZY(self):
+        pass
+    
+
+    # OP CODES
+    def ADC(self):
+
+        value = self.data + (self.get_flag(C) << 8)
+        if value >= 256:
+            self.set_flag(C, True)
+        else:  
+            self.set_flag(C, False)
+            
+        self.set_flag(Z, (value & 0x00FF) == 0)
+        self.set_flag(N, value & 0x80)
+        
+        self.a = value & 0x00FF
+        return 1
 
     def AND(self):
-        pass
-
+        self.a = self.a & self.data
+        self.set_flag(Z, self.a == 0x00)
+        self.set_flag(N, self.a & 0x80) 
+        return 1 
+        
     def ASL(self):
         pass
 
@@ -63,16 +144,16 @@ class CPU:
         pass
 
     def CLC(self):
-        self.status &= ~C
+        self.set_flag(C, False)
 
     def CLD(self):
-        self.status &= ~D
+        self.set_flag(D, False)
 
     def CLI(self):
-        self.status &= ~I
+        self.set_flag(I, False)
 
     def CLV(self):
-        self.status &= ~V
+        self.set_flag(V, False)
 
     def CMP(self):
         pass

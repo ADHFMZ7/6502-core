@@ -1,11 +1,9 @@
 
 
 
-
 class BUS:
 
     def __init__(self):
-        
         self.memory = [0x0] * 64 * 1024
         
         self.data = 0x0
