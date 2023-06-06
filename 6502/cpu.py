@@ -1,14 +1,27 @@
 
 
+C = 1  # Carry
+Z = 2  # Zero
+I = 4  # Interrupt Disable
+D = 8  # Decimal Mode
+
+B = 16 # Break Command
+U = 32 # Unused
+V = 64 # Overflow 
+N = 128 # Negative
 
 class CPU:
-  def __init__(self):
-    self.a = 0
-    self.x = 0
-    self.y = 0
-    self.stkp = 0
-    self.pc = 0
-    self.status = 0
+
+    def __init__(self):
+        self.a = 0
+        self.x = 0
+        self.y = 0
+        self.stkp = 0
+        self.pc = 0
+        self.status = 0
+
+    def reset(self):
+        pass 
 
     def ADC(self):
         pass
@@ -50,16 +63,16 @@ class CPU:
         pass
 
     def CLC(self):
-        pass
+        self.status &= ~C
 
     def CLD(self):
-        pass
+        self.status &= ~D
 
     def CLI(self):
-        pass
+        self.status &= ~I
 
     def CLV(self):
-        pass
+        self.status &= ~V
 
     def CMP(self):
         pass
