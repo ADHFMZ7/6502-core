@@ -14,3 +14,4 @@ class BUS:
     
     def write(self, address, data):
         self.memory[address] = data
+
