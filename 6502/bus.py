@@ -4,7 +4,7 @@
 class BUS:
 
     def __init__(self):
-        self.memory = [0x0] * 64 * 1024
+        self.memory = [0xea] * 64 * 1024
         self.memory[0xFFFC] = 0x00
         self.memory[0xFFFD] = 0x80
         
@@ -20,4 +20,3 @@ class BUS:
         
     def next_byte(self, byte):
         return self.memory[byte + 1]
-

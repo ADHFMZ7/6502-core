@@ -20,7 +20,7 @@ class CPU:
         self.pc = 0 
         self.status = 0 | U
         self.data = 0
-        
+        self.cycles = 0 
         
         self.lookup = {
                 0:   (self.BRK, self.IMM, 7),   1: (self.ORA, self.IZX, 6),   2: (self.STP, self.IMP, 3),   3: (self.SLO, self.IZX, 8),   4: (self.NOP, self.ZP0, 3),   5: (self.ORA, self.ZP0, 3),   6: (self.ASL, self.ZP0, 5),   7: (self.SLO, self.ZP0, 5),   8: (self.PHP, self.IMP, 3),   9: (self.ORA, self.IMM, 2),   10: (self.ASL, self.IMP, 2),  11: (self.ANC, self.IMM, 2),  12: (self.NOP, self.ABS, 4),  13: (self.ORA, self.ABS, 4), 14: (self.ASL, self.ABS, 6), 15: (self.SLO, self.ABS, 6),
@@ -48,8 +48,8 @@ class CPU:
         return self.lookup[self.read(self.pc)]
 
     def execute(self, op, mode, cycles):
-        mode()
-        op()
+        self.mode_cycles = mode()
+        self.op_cycles = op()
         self.pc += 1
         return cycles 
         
@@ -72,8 +72,13 @@ class CPU:
     
     
     def clock(self):
-        op, mode, cycles = self.fetch()
-        self.execute(op, mode, cycles)
+        
+        if self.cycles == 0:
+            op, mode, cycles = self.fetch()
+            self.execute(op, mode, cycles)
+            return
+        self.cycles -= 1
+        
     
     def read(self, address):
         return self.bus.read(address)
@@ -249,7 +254,7 @@ class CPU:
         pass
 
     def NOP(self):
-        pass
+        print("NOP")
 
     def ORA(self):
         pass
@@ -316,3 +321,66 @@ class CPU:
 
     def TYA(self):
         pass
+
+    # Illegal opcodes 
+    def STP(self):
+        pass
+    
+    def SLO(self):
+        pass
+    
+    def ANC(self):
+        pass
+    
+    def RLA(self):
+        pass
+    
+    def SRE(self):
+        pass
+    
+    def RRA(self):
+        pass
+    
+    def SAX(self):
+        pass
+    
+    def LAX(self):
+        pass
+    
+    def ALR(self):
+        pass     
+    
+    def ARR(self):
+        pass
+    
+    def XAA(self):
+        pass
+    
+    def AHX(self):
+        pass
+    
+    def TAS(self):
+        pass
+    
+    def SHY(self):
+        pass
+    
+    def SHX(self):
+        pass
+    
+    def LAS(self):
+        pass
+    
+    def DCP(self):
+        pass
+    
+    def AXS(self):
+        pass
+    
+    def ISC(self):
+        pass
+    
+    
+    
+    
+    

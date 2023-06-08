@@ -25,10 +25,7 @@ def main():
     
     while 1:
         cpu.clock()
-        print(f"{bus.address} {bus.data} {bus.rw}")
-        print(cpu.pc, cpu.address, cpu.data)
-        print(bus)
-        input() 
+        print(f"{cpu.address} {cpu.data} {bus.r}")
         
          
 
