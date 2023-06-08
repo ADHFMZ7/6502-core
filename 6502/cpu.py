@@ -10,14 +10,17 @@ N = 128 # Negative
 
 class CPU:
 
-    def __init__(self):
+    def __init__(self, bus):
+        self.bus = bus
+        
         self.a = 0
         self.x = 0
         self.y = 0
         self.stkp = 0
-        self.pc = 0
-        self.status = 0
+        self.pc = 0 
+        self.status = 0 | U
         self.data = 0
+        
         
         self.lookup = {
                 0:   (self.BRK, self.IMM, 7),   1: (self.ORA, self.IZX, 6),   2: (self.STP, self.IMP, 3),   3: (self.SLO, self.IZX, 8),   4: (self.NOP, self.ZP0, 3),   5: (self.ORA, self.ZP0, 3),   6: (self.ASL, self.ZP0, 5),   7: (self.SLO, self.ZP0, 5),   8: (self.PHP, self.IMP, 3),   9: (self.ORA, self.IMM, 2),   10: (self.ASL, self.IMP, 2),  11: (self.ANC, self.IMM, 2),  12: (self.NOP, self.ABS, 4),  13: (self.ORA, self.ABS, 4), 14: (self.ASL, self.ABS, 6), 15: (self.SLO, self.ABS, 6),
@@ -38,18 +41,28 @@ class CPU:
                 240: (self.BEQ, self.REL, 2), 241: (self.SBC, self.IZY, 5), 242: (self.STP, self.IMP, 3), 243: (self.ISC, self.IZY, 8), 244: (self.NOP, self.ZPX, 4), 245: (self.SBC, self.ZPX, 4), 246: (self.INC, self.ZPX, 6), 247: (self.ISC, self.ZPX, 6), 248: (self.SED, self.IMP, 2), 249: (self.SBC, self.ABY, 4), 250: (self.NOP, self.IMP, 2), 251: (self.ISC, self.ABY, 7), 252: (self.NOP, self.ABX, 4), 253: (self.SBC, self.ABX, 4), 254: (self.INC, self.ABX, 7), 255: (self.ISC, self.ABX, 7)
                 }
 
-    def fetch(self, hexcode):
-        return self.lookup[hexcode]
+
+
+    def fetch(self):
+        self.address = self.pc 
+        return self.lookup[self.read(self.pc)]
 
     def execute(self, op, mode, cycles):
         mode()
         op()
         self.pc += 1
-        
+        return cycles 
         
 
     def reset(self):
-        pass 
+        # Load reset vector
+        self.pc = self.read(0xFFFC) | (self.read(0xFFFD) << 8) 
+        # Initialize registers
+        self.a = 0 
+        self.x = 0
+        self.y = 0
+        self.stkp = 0xFD
+        self.status = 0x00 | U
 
     def irq(self):
         pass
@@ -59,13 +72,14 @@ class CPU:
     
     
     def clock(self):
-        pass
+        op, mode, cycles = self.fetch()
+        self.execute(op, mode, cycles)
     
     def read(self, address):
-        pass
+        return self.bus.read(address)
     
     def write(self, address, data):
-        pass
+        self.bus.write(address, data)
     
     
     def set_flag(self, flag, val):
