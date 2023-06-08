@@ -185,6 +185,11 @@ class CPU:
         pass
 
     def BRK(self):
+        
+
+
+
+
         pass
 
     def BVC(self):

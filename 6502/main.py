@@ -1,21 +1,6 @@
-
 from cpu import CPU
 from bus import BUS
 
-
-
-
-
-
-
-"""
-
-
-
-
-
-
-"""
 
 def main():
     bus = BUS()
@@ -25,12 +10,11 @@ def main():
     
     while 1:
         cpu.clock()
-        print(f"{cpu.address} {cpu.data} {bus.r}")
+        print(f"{hex(cpu.address)} {hex(cpu.data)} {bus.r}")
+        if cpu.address == 0xffff:
+            break
+            
         
-         
-
-
-
+        
 if __name__ == '__main__':
     main()
-
