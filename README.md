@@ -1,1 +1,1 @@
-# mips-core
+# 6502-core
