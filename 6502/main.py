@@ -7,13 +7,14 @@ def main():
     cpu = CPU(bus) 
     
     cpu.reset() 
-    
-    while 1:
-        cpu.clock()
-        print(f"{hex(cpu.address)} {hex(cpu.data)} {bus.r}")
-        if cpu.address == 0xffff:
-            break
-            
+
+    bus.dump_memory()
+
+    # while 1:
+    #     cpu.clock()
+    #     print(f"{hex(cpu.address)} {hex(cpu.data)} {bus.r}")
+    #     if cpu.address == 0xffff:
+    #         break
         
         
 if __name__ == '__main__':
