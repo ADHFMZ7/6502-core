@@ -20,13 +20,22 @@ class BUS:
     def next_byte(self, byte):
         return self.memory[byte + 1]
 
-    def dump_memory(self, start=0, end=MEMORY_SIZE):
-        for addr, data in enumerate(self.memory):
+    def dump_memory(self, start_addr=0):
+        # if start_addr % 16:
+        #     start = start_adr - start % 16
+        start = start_addr if not start_addr % 16 else start_addr - start_addr % 16
+
+        for offset, data in enumerate(self.memory[start:]):
+            addr = start + offset
             if not addr % 16:
-                print(addr, end="\t")
+                print("\033[34m{:04x}\033[0m".format(addr), end="  ")
             elif not addr % 8:
                 print(" ", end="")
-            print("{:02x}".format(data), end=" ")
+
+            if addr == start_addr:
+                print("\033[91m{:02x}\033[0m".format(data), end=" ")
+            else:
+                print("{:02x}".format(data), end=" ")
             if addr % 16 == 15:
                 print("\n", end="")
 

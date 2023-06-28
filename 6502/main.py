@@ -8,7 +8,8 @@ def main():
     
     cpu.reset() 
 
-    bus.dump_memory()
+    bus.dump_memory(65000)
+    # bus.dump_memory_better(65000)
 
     # while 1:
     #     cpu.clock()
