@@ -6,8 +6,8 @@ This is an implementation of a 6502 emulator written in python.
 ## Registers
 8-bit:
 - A register: Accumulator
-- X register
-- Y register
+- X register: X index
+- Y register: Y index
 - stkp: stack pointer
 - status: status register
 16-bit:
