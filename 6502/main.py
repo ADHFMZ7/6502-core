@@ -16,7 +16,12 @@ def main():
         # print(f"{hex(cpu.address)} {hex(cpu.data)} {bus.r}")
 
         bus.dump_memory_at_addr(cpu.pc)
-        input()
+        cpu.print_status()
+        try:
+            input()
+        except:
+            print("\nExiting cpu")
+            exit(0)
 
         if cpu.address == 0xffff:
             break

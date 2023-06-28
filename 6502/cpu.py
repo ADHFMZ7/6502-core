@@ -1,12 +1,14 @@
-C = 1  # Carry
-Z = 2  # Zero
-I = 4  # Interrupt Disable
-D = 8  # Decimal Mode
+# C = 1  # Carry
+# Z = 2  # Zero
+# I = 4  # Interrupt Disable
+# D = 8  # Decimal Mode
+#
+# B = 16 # Break Command
+# U = 32 # Unused
+# V = 64 # Overflow 
+# N = 128 # Negative
 
-B = 16 # Break Command
-U = 32 # Unused
-V = 64 # Overflow 
-N = 128 # Negative
+C, Z, I, D, B, U, V, N = [2**i for i in range(8)]
 
 class CPU:
 
@@ -417,8 +419,15 @@ class CPU:
     
     def ISC(self):
         return 0
-    
-    
-    
+   
+   
+   
+    def print_status(self):
+        
+        print("CZIDBUVN")
+        print(*(int(self.get_flag(2**i)) for i in range(8)), end="\n", sep="")
+        
+        
+            
     
     
