@@ -17,8 +17,9 @@ def main():
 
         bus.dump_memory_at_addr(cpu.pc)
         cpu.print_status()
+
         try:
-            input()
+            input("Press enter to step clock...")
         except:
             print("\nExiting cpu")
             exit(0)
