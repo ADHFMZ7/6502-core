@@ -66,7 +66,6 @@ class CPU:
         """
         Executes the instruction and returns the number of cycles it took 
         """
-        print(op, mode, cycles)
         self.pc += 1
         mode_cycles = mode()  
         op_cycles = op()
