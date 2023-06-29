@@ -10,6 +10,7 @@ This is an implementation of a 6502 emulator written in python.
 - Y register: Y index
 - stkp: stack pointer
 - status: status register
+
 16-bit:
 - pc: program counter
 
