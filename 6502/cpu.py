@@ -32,7 +32,6 @@ class CPU:
         # Internal Helpers 
         self.data = 0
         self.address = 0
-        self.cycles = 0 
        
         # Table of all ops
         self.lookup = {
@@ -64,11 +63,9 @@ class CPU:
         """
        
         
-        if self.cycles == 0:
-            op, mode, cycles = self.fetch()
-            self.execute(op, mode, cycles)
-            return
-        self.cycles -= 1
+        op, mode, cycles = self.fetch()
+        self.execute(op, mode, cycles)
+        return
 
     def fetch(self):
         """
@@ -82,16 +79,29 @@ class CPU:
         """
         executes the functions for the given opcode and addressing mode
         and increments the program counter. 
+        
+        It also calculates the number of cycles for the current instruction
+        and runs the corresponding number of cycles.
         """
+        start_addr = self.pc
         self.pc += 1
         mode_cycles = mode()  
         op_cycles = op()
-        
-        self.cycles = cycles 
-        
-        if mode_cycles and op_cycles:
-            self.cycles += mode_cycles + op_cycles - 1
-        
+     
+       
+        total_cycles = mode_cycles + op_cycles + cycles 
+        if op_cycles and mode_cycles:
+            if self.page_boundary_crossed(start_addr, self.pc - 1):
+                total_cycles += 1
+            if mode_cycles == 2: # branch taken
+                total_cycles += 1
+
+            print(f"operation {op} will take {total_cycles} cycles using addressing mode {mode}")
+        for cycle in reversed(range(total_cycles)):
+            pass
+
+    def page_boundary_crossed(self, addr1, addr2):
+        return (addr1 & 0xFF00) != (addr2 & 0xFF00)
 
     def reset(self):
         # Load reset vector
@@ -104,7 +114,7 @@ class CPU:
         self.status = 0x00 | U
 
     def irq(self):
-        self.cycles = 7
+        cycles = 7
         self.write(0x0100 + self.stkp, (self.pc >> 8) & 0x00FF)
         self.stkp -= 1 
        
@@ -114,10 +124,6 @@ class CPU:
     
     def nmi(self):
         return 0
-    
-    
-
-        
     
     def read(self, address):
         return self.bus.read(address)
@@ -168,7 +174,9 @@ class CPU:
         return 0
     
     def REL(self): # Relative
-        return 0
+        self.address = self.read(self.pc) + self.pc
+        self.pc += 1
+        return 1
    
     def ABS(self): # Absolute
         self.address = self.read(self.pc) | (self.read(self.pc + 1) << 8)
@@ -196,7 +204,7 @@ class CPU:
         return 0
     
     def IZY(self): # Indirect Indexed Y
-        return 0
+        return 1
    
 
     # OP CODES
@@ -252,6 +260,11 @@ class CPU:
         return 2
 
     def BNE(self): # Branch if Not Equal
+        
+        if self.get_flag(Z):
+            return 1
+        
+        self.pc = self.address 
         return 2
 
     def BPL(self): # Branch if Positive
@@ -331,7 +344,6 @@ class CPU:
         return 0
 
     def NOP(self): # No Operation
-        print("NOP")
         return 0
 
     def ORA(self): # Logical Inclusive OR

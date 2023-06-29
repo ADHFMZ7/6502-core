@@ -11,6 +11,7 @@ def main():
     bus.load_rom("s.bin", 0x8000) 
         
     while cpu.address < 0xffff:
+    # for i in range(200):
         cpu.clock()
         
     print("CPU halted") 
