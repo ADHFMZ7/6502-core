@@ -55,7 +55,6 @@ class CPU:
                 }
 
 
-
     def fetch(self):
         """
         Fetches the next instruction from memory and returns the opcode, addressing mode and cycles 
@@ -67,6 +66,7 @@ class CPU:
         """
         Executes the instruction and returns the number of cycles it took 
         """
+        print(op, mode, cycles)
         self.pc += 1
         mode_cycles = mode()  
         op_cycles = op()
@@ -85,6 +85,12 @@ class CPU:
         self.status = 0x00 | U
 
     def irq(self):
+        self.cycles = 7
+        self.write(0x0100 + self.stkp, (self.pc >> 8) & 0x00FF)
+        self.stkp -= 1 
+       
+        # TODO: FINISH THIS  
+        
         return 0
     
     def nmi(self):
@@ -332,34 +338,34 @@ class CPU:
     def SED(self): # Set Decimal Flag
         return 0
 
-    def SEI(self):
+    def SEI(self): # Set Interrupt Disable
         return 0
 
-    def STA(self):
+    def STA(self): # Store Accumulator
         return 0
 
-    def STX(self):
+    def STX(self): # Store X Register
         return 0
 
-    def STY(self):
+    def STY(self): # Store Y Register
         return 0
 
-    def TAX(self):
+    def TAX(self): # Transfer Accumulator to X
         return 0
 
-    def TAY(self):
+    def TAY(self): # Transfer Accumulator to Y
         return 0
 
-    def TSX(self):
+    def TSX(self): # Transfer Stack Pointer to X
         return 0
 
-    def TXA(self):
+    def TXA(self): # Transfer X to Accumulator
         return 0
 
-    def TXS(self):
+    def TXS(self): # Transfer X to Stack Pointer
         return 0
 
-    def TYA(self):
+    def TYA(self): # Transfer Y to Accumulator
         return 0
 
     # Illegal opcodes 
@@ -420,11 +426,17 @@ class CPU:
     def ISC(self):
         return 0
    
-   
-   
-    def print_status(self):
-        
-        print("CZIDBUVN")
+    def KIL(self):
+        return 0
+    
+    def print_registers(self):
+        print("A:  {:04x}".format(self.a), end="\t")
+        print("X:  {:04x}".format(self.x), end="\t")
+        print("Y:  {:04x}".format(self.y))
+        print("PC: {:04x}".format(self.pc), end="\t")
+        print("SP: {:04x}".format(self.stkp), end="\t")
+
+        print("Status:", end=" ")
         print(*(int(self.get_flag(2**i)) for i in range(8)), end="\n", sep="")
         
         

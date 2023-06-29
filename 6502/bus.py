@@ -38,7 +38,6 @@ class BUS:
                 print("{:02x}".format(data), end=" ")
             if addr % 16 == 15:
                 print("\n", end="")
-        print()
                 
     def dump_memory_at_addr(self, start_addr=0):
         # if start_addr % 16:
@@ -61,7 +60,6 @@ class BUS:
                 print("{:02x}".format(data), end=" ")
             if addr % 16 == 15:
                 print("\n", end="")
-        print()
                 
     def dump_memory_range(self, start_addr, end_addr):
         for offset, data in enumerate(self.memory[start_addr:end_addr+1]):
@@ -74,7 +72,6 @@ class BUS:
             print("{:02x}".format(data), end=" ")
             if addr % 16 == 15:
                 print("\n", end="")
-        print()
 
 
     def load_rom(self, file_name, addr=0x8000):
