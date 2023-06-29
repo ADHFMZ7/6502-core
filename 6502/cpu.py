@@ -54,23 +54,43 @@ class CPU:
                 240: (self.BEQ, self.REL, 2), 241: (self.SBC, self.IZY, 5), 242: (self.STP, self.IMP, 3), 243: (self.ISC, self.IZY, 8), 244: (self.NOP, self.ZPX, 4), 245: (self.SBC, self.ZPX, 4), 246: (self.INC, self.ZPX, 6), 247: (self.ISC, self.ZPX, 6), 248: (self.SED, self.IMP, 2), 249: (self.SBC, self.ABY, 4), 250: (self.NOP, self.IMP, 2), 251: (self.ISC, self.ABY, 7), 252: (self.NOP, self.ABX, 4), 253: (self.SBC, self.ABX, 4), 254: (self.INC, self.ABX, 7), 255: (self.ISC, self.ABX, 7)
                 }
 
+    def clock(self):
+        """
+        Advances the CPU by one clock cycle. 
+        
+        This is the main function of the CPU. It fetches the next instruction,
+        executes it and decrements the number of cycles left for the current 
+        instruction. 
+        """
+       
+        
+        if self.cycles == 0:
+            op, mode, cycles = self.fetch()
+            self.execute(op, mode, cycles)
+            return
+        self.cycles -= 1
 
     def fetch(self):
         """
-        Fetches the next instruction from memory and returns the opcode, addressing mode and cycles 
+        Fetches the next instruction from memory and returns the opcode, 
+        addressing mode and base cycles.
         """
         self.address = self.pc 
         return self.lookup[self.read(self.pc)]
 
     def execute(self, op, mode, cycles):
         """
-        Executes the instruction and returns the number of cycles it took 
+        executes the functions for the given opcode and addressing mode
+        and increments the program counter. 
         """
         self.pc += 1
         mode_cycles = mode()  
         op_cycles = op()
-        self.cycles = cycles + mode_cycles + op_cycles
-        return cycles 
+        
+        self.cycles = cycles 
+        
+        if mode_cycles and op_cycles:
+            self.cycles += mode_cycles + op_cycles - 1
         
 
     def reset(self):
@@ -96,13 +116,7 @@ class CPU:
         return 0
     
     
-    def clock(self):
-        
-        if self.cycles == 0:
-            op, mode, cycles = self.fetch()
-            self.execute(op, mode, cycles)
-            return
-        self.cycles -= 1
+
         
     
     def read(self, address):
@@ -123,6 +137,13 @@ class CPU:
 
 
     # Addressing Modes
+    # These addressing mode functions place the data that will be
+    # operated on in the self.data variable.
+    # Some instructions don't have to fetch data, or don't have 
+    # to store data, so they don't have an addressing mode function.
+    
+    # The functions return how many possible extra cycles the instruction
+    # could take.  
     
     def IMP(self): # Implied
         return 0
@@ -130,6 +151,8 @@ class CPU:
     def IMM(self): # Immediate
         self.address = self.pc
         self.pc += 1 
+        
+        self.data = self.read(self.address)
         return 0
     
     def ZP0(self): # Zero Page
@@ -138,6 +161,7 @@ class CPU:
         return 0 
     
     def ZPX(self): # Zero Page X
+        
         return 0
     
     def ZPY(self): # Zero Page Y
@@ -154,12 +178,12 @@ class CPU:
     def ABX(self): # Absolute X
         self.address = self.read(self.pc) | (self.read(self.pc + 1) << 8) + self.x
         self.pc += 2
-        return 0
+        return 1
     
     def ABY(self): # Absolute Y
         self.address = self.read(self.pc) | (self.read(self.pc + 1) << 8) + self.y
         self.pc += 2
-        return 0
+        return 1
    
     def ACC(self): # Accumulator
         self.data = self.a
@@ -176,6 +200,16 @@ class CPU:
    
 
     # OP CODES
+    # These functions are the actual instructions that the CPU executes.
+   
+    # These functions assume that the data to be operated on is in the 
+    # self.data variable.
+    
+    # They return if the instruction may need an extra cycle to complete.
+    # This along with the return value of the addressing mode function
+    # determines how many cycles to add to the total cycle count.
+
+    
     def ADC(self): # Add with Carry
 
         value = self.data + (self.get_flag(C) << 8)
@@ -200,38 +234,37 @@ class CPU:
         self.set_flag(C, self.data & 0x80)
         self.a = self.data << 1
         self.set_flag(Z, self.a == 0x00)
-
-          
-        
-    def BCC(self): # Branch if Carry Clear
         return 0
+
+    def BCC(self): # Branch if Carry Clear
+        return 2
 
     def BCS(self): # Branch if Carry Set
-        return 0
+        return 2
 
     def BEQ(self): # Branch if Equal
-        return 0
+        return 2
 
     def BIT(self): # Bit Test
         return 0
 
     def BMI(self): # Branch if Minus
-        return 0
+        return 2
 
     def BNE(self): # Branch if Not Equal
-        return 0
+        return 2
 
     def BPL(self): # Branch if Positive
-        return 0
+        return 2
 
     def BRK(self): # Force Interrupt
         return 0
 
     def BVC(self): # Branch if Overflow Clear
-        return 0
+        return 2   
 
     def BVS(self): # Branch if Overflow Set
-        return 0
+        return 2
 
     def CLC(self): # Clear Carry Flag
         self.set_flag(C, False)
@@ -250,7 +283,7 @@ class CPU:
         return 0
 
     def CMP(self): # Compare
-        return 0
+        return 1
 
     def CPX(self): # Compare X Register
         return 0
@@ -268,7 +301,7 @@ class CPU:
         return 0
 
     def EOR(self): # Exclusive OR
-        return 0
+        return 1
 
     def INC(self): # Increment Memory
         return 0
@@ -286,13 +319,13 @@ class CPU:
         return 0
 
     def LDA(self): # Load Accumulator
-        return 0
+        return 1
 
     def LDX(self): # Load X Register
-        return 0
+        return 1
 
     def LDY(self): # Load Y Register
-        return 0
+        return 1
 
     def LSR(self): # Logical Shift Right
         return 0
@@ -302,7 +335,7 @@ class CPU:
         return 0
 
     def ORA(self): # Logical Inclusive OR
-        return 0
+        return 1
 
     def PHA(self): # Push Accumulator
         return 0
@@ -329,7 +362,7 @@ class CPU:
         return 0
 
     def SBC(self): # Subtract with Carry
-        return 0
+        return 1
 
     def SEC(self): # Set Carry Flag
         return 0
