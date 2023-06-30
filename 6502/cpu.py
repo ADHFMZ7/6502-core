@@ -96,7 +96,7 @@ class CPU:
             if mode_cycles == 2: # branch taken
                 total_cycles += 1
 
-            print(f"operation {op} will take {total_cycles} cycles using addressing mode {mode}")
+            #print(f"operation {op} will take {total_cycles} cycles using addressing mode {mode}")
         for cycle in reversed(range(total_cycles)):
             pass
 
