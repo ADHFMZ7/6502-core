@@ -176,6 +176,7 @@ class CPU:
     def REL(self): # Relative
         self.address = self.read(self.pc) + self.pc
         self.pc += 1
+        
         return 1
    
     def ABS(self): # Absolute
@@ -183,7 +184,7 @@ class CPU:
         self.pc += 2
         return 0
     
-    def ABX(self): # Absolute X
+    def ABX(self): # Absolute X THIS ONE IS MORE COMPLICATED CLOCKS
         self.address = self.read(self.pc) | (self.read(self.pc + 1) << 8) + self.x
         self.pc += 2
         return 1
@@ -245,19 +246,45 @@ class CPU:
         return 0
 
     def BCC(self): # Branch if Carry Clear
-        return 2
+        
+        if not self.get_flag(C):
+            pc = self.address
+            return 2
+         
+        return 1
 
     def BCS(self): # Branch if Carry Set
-        return 2
+       
+        if self.get_flag(C):
+            pc = self.address
+            return 2
+        
+        return 1
 
     def BEQ(self): # Branch if Equal
-        return 2
+        
+        if self.get_flag(Z):
+            pc = self.address
+            return 2
+        
+        return 1 
 
     def BIT(self): # Bit Test
+       
+        #TODO:  FINISH THIS   
+        
+        # self.set_flag(N)
+        # self.set_flag(V)
+        # self.set_flag(Z)
         return 0
 
     def BMI(self): # Branch if Minus
-        return 2
+        
+        if self.get_flag(N):
+            self.pc = self.address
+            return 2
+        
+        return 1
 
     def BNE(self): # Branch if Not Equal
         
@@ -268,16 +295,31 @@ class CPU:
         return 2
 
     def BPL(self): # Branch if Positive
-        return 2
+        
+        if not self.get_flag(N):
+            self.pc = self.address
+            return 2 
+        
+        return 1
 
     def BRK(self): # Force Interrupt
         return 0
 
     def BVC(self): # Branch if Overflow Clear
-        return 2   
+        
+        if not self.get_flag(V):
+            self.pc = self.address
+            return 2
+        
+        return 1
 
     def BVS(self): # Branch if Overflow Set
-        return 2
+        
+        if self.get_flag(V):
+            self.pc = self.address
+            return 2
+        
+        return 1
 
     def CLC(self): # Clear Carry Flag
         self.set_flag(C, False)
