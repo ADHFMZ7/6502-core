@@ -98,7 +98,7 @@ class CPU:
 
             #print(f"operation {op} will take {total_cycles} cycles using addressing mode {mode}")
         for cycle in reversed(range(total_cycles)):
-            pass
+            print(f"{cycle} cycles left")
 
     def page_boundary_crossed(self, addr1, addr2):
         return (addr1 & 0xFF00) != (addr2 & 0xFF00)
@@ -175,22 +175,26 @@ class CPU:
     
     def REL(self): # Relative
         self.address = self.read(self.pc) + self.pc
+        self.data = self.read(self.address)
         self.pc += 1
         
         return 1
    
     def ABS(self): # Absolute
         self.address = self.read(self.pc) | (self.read(self.pc + 1) << 8)
+        self.data = self.read(self.address)
         self.pc += 2
         return 0
     
     def ABX(self): # Absolute X THIS ONE IS MORE COMPLICATED CLOCKS
         self.address = self.read(self.pc) | (self.read(self.pc + 1) << 8) + self.x
+        self.data = self.read(self.address)
         self.pc += 2
         return 1
     
     def ABY(self): # Absolute Y
         self.address = self.read(self.pc) | (self.read(self.pc + 1) << 8) + self.y
+        self.data = self.read(self.address)
         self.pc += 2
         return 1
    
@@ -198,10 +202,11 @@ class CPU:
         self.data = self.a
         return 0
     
-    def IND(self): # Indirect
+    def IND(self): # Indirect   
         return 0
 
     def IZX(self): # Indexed Indirect X
+        self.address
         return 0
     
     def IZY(self): # Indirect Indexed Y
@@ -338,6 +343,8 @@ class CPU:
         return 0
 
     def CMP(self): # Compare
+        self.a -= self.data
+        
         return 1
 
     def CPX(self): # Compare X Register
