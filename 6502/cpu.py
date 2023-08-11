@@ -99,8 +99,8 @@ class CPU:
                 total_cycles += 1
 
             #print(f"operation {op} will take {total_cycles} cycles using addressing mode {mode}")
-        for cycle in reversed(range(total_cycles)):
-            print(f"{cycle} cycles left")
+        # for cycle in reversed(range(total_cycles)):
+        #     print(f"{cycle} cycles left")
 
     def page_boundary_crossed(self, addr1: int, addr2: int):
         return (addr1 & 0xFF00) != (addr2 & 0xFF00)
@@ -383,21 +383,44 @@ class CPU:
         return 0
 
     def DEY(self): # Decrement Y Register
+        self.y -= 1
+        
+        self.set_flag(Z, self.y == 0)
+        self.set_flag(N, self.y < 0)
         return 0
 
     def EOR(self): # Exclusive OR
+        self.a = self.a ^ self.data
+        
+        self.set_flag(Z, self.a == 0)
+        self.set_flag(N, self.a < 0)
         return 1
 
     def INC(self): # Increment Memory
+        self.write(self.address, self.read(self.address) + 1)
+        val = self.read(self.address)
+        
+        self.set_flag(Z, val == 0)
+        self.set_flag(N, val < 0)
         return 0
 
     def INX(self): # Increment X Register
+        
+        self.x += 1
+        
+        self.set_flag(Z, self.x == 0)
+        self.set_flag(N, self.x < 0)
         return 0
 
     def INY(self): # Increment Y Register
+        self.y += 1
+        
+        self.set_flag(Z, self.y == 0)
+        self.set_flag(N, self.y < 0)
         return 0
 
     def JMP(self): # Jump
+        
         return 0
 
     def JSR(self): # Jump to Subroutine

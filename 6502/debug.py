@@ -24,6 +24,8 @@ def main():
         inp = input("\033[31m>>>\033[0m ")
         if inp: 
             command = inp
+        else: 
+            continue
         if command in ["h", "help"]:
             print_help()
         elif command in ["n", "next"]:
