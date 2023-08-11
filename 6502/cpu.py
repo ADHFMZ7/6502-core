@@ -1,3 +1,5 @@
+from bus import BUS
+
 # C = 1  # Carry
 # Z = 2  # Zero
 # I = 4  # Interrupt Disable
@@ -17,7 +19,7 @@ class CPU:
     """
 
 
-    def __init__(self, bus):
+    def __init__(self, bus: BUS):
         # Connected BUS device
         self.bus = bus
        
@@ -75,7 +77,7 @@ class CPU:
         self.address = self.pc 
         return self.lookup[self.read(self.pc)]
 
-    def execute(self, op, mode, cycles):
+    def execute(self, op: callable, mode: callable, cycles: int):
         """
         executes the functions for the given opcode and addressing mode
         and increments the program counter. 
@@ -100,7 +102,7 @@ class CPU:
         for cycle in reversed(range(total_cycles)):
             print(f"{cycle} cycles left")
 
-    def page_boundary_crossed(self, addr1, addr2):
+    def page_boundary_crossed(self, addr1: int, addr2: int):
         return (addr1 & 0xFF00) != (addr2 & 0xFF00)
 
     def reset(self):
@@ -125,20 +127,19 @@ class CPU:
     def nmi(self):
         return 0
     
-    def read(self, address):
+    def read(self, address: int):
         return self.bus.read(address)
     
-    def write(self, address, data):
+    def write(self, address: int, data: int):
         self.bus.write(address, data)
     
-    
-    def set_flag(self, flag, val):
+    def set_flag(self, flag: int, val: int):
         if val:
             self.status |= flag
         else:
             self.status &= ~flag
       
-    def get_flag(self, flag):
+    def get_flag(self, flag: int):
         return (self.status & flag) > 0  
 
 
@@ -343,20 +344,42 @@ class CPU:
         return 0
 
     def CMP(self): # Compare
-        self.a -= self.data
-        
+        val = self.a - self.data
+       
+        self.set_flag(Z, val == 0)
+        self.set_flag(N, val < 0)
+        self.set_flag(C, val >= 0)
         return 1
 
     def CPX(self): # Compare X Register
+        val = self.x - self.data
+        
+        self.set_flag(Z, val == 0)
+        self.set_flag(N, val < 0)
+        self.set_flag(C, val >= 0)
         return 0
 
     def CPY(self): # Compare Y Register
+        val = self.y - self.data
+        
+        self.set_flag(Z, val == 0)
+        self.set_flag(N, val < 0)
+        self.set_flag(C, val >= 0)
         return 0
 
     def DEC(self): # Decrement Memory
+        self.write(self.address, self.read(self.address) - 1)
+        val = self.read(self.address)
+        
+        self.set_flag(Z, val == 0)
+        self.set_flag(N, val < 0)
         return 0
 
     def DEX(self): # Decrement X Register
+        self.x -= 1
+        
+        self.set_flag(Z, self.x == 0)
+        self.set_flag(N, self.x < 0)
         return 0
 
     def DEY(self): # Decrement Y Register
