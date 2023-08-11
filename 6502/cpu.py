@@ -508,39 +508,61 @@ class CPU:
         return 1
 
     def SEC(self): # Set Carry Flag
+        self.set_flag(C, 1)
         return 0
 
     def SED(self): # Set Decimal Flag
+        self.set_flag(D, 1)
         return 0
 
     def SEI(self): # Set Interrupt Disable
+        self.set_flag(I, 1)
         return 0
 
     def STA(self): # Store Accumulator
+        self.write(self.address, self.a)
         return 0
 
     def STX(self): # Store X Register
+        self.write(self.address, self.x)
         return 0
 
     def STY(self): # Store Y Register
+        self.write(self.address, self.y)
         return 0
 
     def TAX(self): # Transfer Accumulator to X
+        self.x = self.a
+        self.set_flag(N, self.x < 0)
+        self.set_flag(Z, self.x == 0)
         return 0
 
     def TAY(self): # Transfer Accumulator to Y
+        self.y = self.a
+        self.set_flag(N, self.y < 0)
+        self.set_flag(Z, self.y == 0)
         return 0
 
     def TSX(self): # Transfer Stack Pointer to X
+        self.x = self.stkp
+        self.set_flag(N, self.x < 0)
+        self.set_flag(Z, self.x == 0)
         return 0
 
     def TXA(self): # Transfer X to Accumulator
+        self.a = self.x
+        self.set_flag(N, self.a < 0)
+        self.set_flag(Z, self.a == 0)
         return 0
 
     def TXS(self): # Transfer X to Stack Pointer
+        self.stkp = self.x
         return 0
 
     def TYA(self): # Transfer Y to Accumulator
+        self.x = self.a
+        self.set_flag(N, self.x < 0)
+        self.set_flag(Z, self.x == 0)
         return 0
 
     # Illegal opcodes 
