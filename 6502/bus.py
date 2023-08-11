@@ -11,16 +11,16 @@ class BUS:
         self.address = 0x0
         self.r = 1 
        
-    def read(self, address):
+    def read(self, address: int):
         return self.memory[address]
     
-    def write(self, address, data):
+    def write(self, address: int, data: int):
         self.memory[address] = data
         
-    def next_byte(self, byte):
+    def next_byte(self, byte: int):
         return self.memory[byte + 1]
 
-    def dump_memory(self, start_addr=0):
+    def dump_memory(self, start_addr: int = 0):
         # if start_addr % 16:
         #     start = start_adr - start % 16
         start = start_addr if not start_addr % 16 else start_addr - start_addr % 16
@@ -39,7 +39,7 @@ class BUS:
             if addr % 16 == 15:
                 print("\n", end="")
                 
-    def dump_memory_at_addr(self, start_addr=0):
+    def dump_memory_at_addr(self, start_addr: int = 0):
         # if start_addr % 16:
         #     start = start_adr - start % 16
         
@@ -61,7 +61,7 @@ class BUS:
             if addr % 16 == 15:
                 print("\n", end="")
                 
-    def dump_memory_range(self, start_addr, end_addr):
+    def dump_memory_range(self, start_addr: int, end_addr: int):
         for offset, data in enumerate(self.memory[start_addr:end_addr+1]):
             addr = start_addr + offset
             if not addr % 16:
@@ -74,7 +74,7 @@ class BUS:
                 print("\n", end="")
 
 
-    def load_rom(self, file_name, addr=0x8000):
+    def load_rom(self, file_name: str, addr: int = 0x8000):
         with open(file_name, "rb") as file:
             while (byte := file.read(1)):
                 self.memory[addr] = ord(byte)
