@@ -11,7 +11,7 @@ def main():
      
     cpu.reset() 
          
-    bus.load_rom("s.bin", 0x8000) 
+    bus.load_rom("../nestest.nes", 0x8000) 
     
     print("6502 Debugger")
    

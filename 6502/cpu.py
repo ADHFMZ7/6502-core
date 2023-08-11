@@ -63,7 +63,6 @@ class CPU:
         executes it and decrements the number of cycles left for the current 
         instruction. 
         """
-       
         
         op, mode, cycles = self.fetch()
         self.execute(op, mode, cycles)
@@ -88,9 +87,11 @@ class CPU:
         start_addr = self.pc
         self.pc += 1
         mode_cycles = mode()  
-        op_cycles = op()
+        if mode == self.ACC:
+            op_cycles = op(True)
+        else:
+            op_cycles = op()
      
-       
         total_cycles = mode_cycles + op_cycles + cycles 
         if op_cycles and mode_cycles:
             if self.page_boundary_crossed(start_addr, self.pc - 1):
@@ -146,8 +147,6 @@ class CPU:
     # Addressing Modes
     # These addressing mode functions place the data that will be
     # operated on in the self.data variable.
-    # Some instructions don't have to fetch data, or don't have 
-    # to store data, so they don't have an addressing mode function.
     
     # The functions return how many possible extra cycles the instruction
     # could take.  
@@ -175,6 +174,10 @@ class CPU:
         return 0
     
     def REL(self): # Relative
+        """
+        Calculates the relative jump that would be taken and put
+        it into the address variable
+        """
         self.address = self.read(self.pc) + self.pc
         self.data = self.read(self.address)
         self.pc += 1
@@ -182,6 +185,12 @@ class CPU:
         return 1
    
     def ABS(self): # Absolute
+        """
+        Gets the next two bytes and combines them into the address
+        variable
+        
+        Also stores the data in the calculated memory address
+        """
         self.address = self.read(self.pc) | (self.read(self.pc + 1) << 8)
         self.data = self.read(self.address)
         self.pc += 2
@@ -203,7 +212,7 @@ class CPU:
         self.data = self.a
         return 0
     
-    def IND(self): # Indirect   
+    def IND(self): # Indirect 
         return 0
 
     def IZX(self): # Indexed Indirect X
@@ -245,10 +254,16 @@ class CPU:
         self.set_flag(N, self.a & 0x80) 
         return 1 
         
-    def ASL(self): # Arithmetic Shift Left
+    def ASL(self, is_acc: bool = False): # Arithmetic Shift Left
+      
         self.set_flag(C, self.data & 0x80)
-        self.a = self.data << 1
-        self.set_flag(Z, self.a == 0x00)
+        val = self.data << 1
+        self.set_flag(N, val & 0x80)
+        self.set_flag(Z, val == 0x00)
+        if is_acc:
+            self.a = val
+        else: 
+            self.write(self.address, val)
         return 0
 
     def BCC(self): # Branch if Carry Clear
@@ -420,22 +435,42 @@ class CPU:
         return 0
 
     def JMP(self): # Jump
-        
+        # TODO: Double check this is correct 
+        self.pc = self.address 
+      
         return 0
 
     def JSR(self): # Jump to Subroutine
+        # TODO: THIS
         return 0
 
     def LDA(self): # Load Accumulator
+        self.a = self.read(self.address)
+        self.set_flag(Z, self.a == 0)
+        self.set_flag(N, self.a < 0)
         return 1
 
     def LDX(self): # Load X Register
+        self.x = self.read(self.address)
+        self.set_flag(Z, self.x == 0)
+        self.set_flag(N, self.x < 0)
         return 1
 
     def LDY(self): # Load Y Register
+        self.y = self.read(self.address)
+        self.set_flag(Z, self.y == 0)
+        self.set_flag(N, self.y < 0)
         return 1
 
-    def LSR(self): # Logical Shift Right
+    def LSR(self, is_acc: bool = False): # Logical Shift Right
+        self.set_flag(C, self.data & 0x01)
+        val = self.data >> 1
+        self.set_flag(N, 0)
+        self.set_flag(Z, val == 0x00)
+        if is_acc:
+            self.a = val
+        else: 
+            self.write(self.address, val)
         return 0
 
     def NOP(self): # No Operation
@@ -456,10 +491,11 @@ class CPU:
     def PLP(self): # Pull Processor Status
         return 0
 
-    def ROL(self): # Rotate Left
+    def ROL(self, is_acc: bool = False): # Rotate Left
+        
         return 0
 
-    def ROR(self): # Rotate Right
+    def ROR(self, is_acc: bool = False): # Rotate Right
         return 0
 
     def RTI(self): # Return from Interrupt
