@@ -8,13 +8,10 @@ import curses
 def main():
     bus = BUS()
     cpu = CPU(bus) 
-     
-    cpu.reset() 
          
     bus.load_rom("../nestest.nes", 0x8000) 
     
     print("6502 Debugger")
-   
     
     #bus.dump_memory_range(0x8000, 0x8100)
         

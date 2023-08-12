@@ -1,5 +1,8 @@
 from bus import BUS
 
+# TODO: Stack ops and Interrupts
+#       In the future; illegal ops
+
 # C = 1  # Carry
 # Z = 2  # Zero
 # I = 4  # Interrupt Disable
@@ -21,15 +24,26 @@ class CPU:
 
     def __init__(self, bus: BUS):
         # Connected BUS device
-        self.bus = bus
+        self.bus = bus 
+      
+    # def reset(self):
+    #     # Load reset vector
+    #     self.pc = self.read(0xFFFC) | (self.read(0xFFFD) << 8) 
+    #     # Initialize registers
+    #     self.a = 0 
+    #     self.x = 0
+    #     self.y = 0
+    #     self.sp = 0xFD
+    #     self.status = 0x00 | U 
        
         # Registers
-        self.a = 0
-        self.x = 0
-        self.y = 0
-        self.stkp = 0
-        self.pc = 0 
-        self.status = 0 | U
+        # self.a = 0
+        # self.x = 0
+        # self.y = 0
+        # self.sp = 0
+        # self.pc = 0 
+        # self.status = 0 | U
+        self.reset()
 
         # Internal Helpers 
         self.data = 0
@@ -99,7 +113,7 @@ class CPU:
             if mode_cycles == 2: # branch taken
                 total_cycles += 1
 
-            #print(f"operation {op} will take {total_cycles} cycles using addressing mode {mode}")
+        # print(f"operation {op} will take {total_cycles} cycles using addressing mode {mode}")
         # for cycle in reversed(range(total_cycles)):
         #     print(f"{cycle} cycles left")
 
@@ -113,13 +127,13 @@ class CPU:
         self.a = 0 
         self.x = 0
         self.y = 0
-        self.stkp = 0xFD
+        self.sp = 0xFD
         self.status = 0x00 | U
 
     def irq(self):
         cycles = 7
-        self.write(0x0100 + self.stkp, (self.pc >> 8) & 0x00FF)
-        self.stkp -= 1 
+        self.write(0x0100 + self.sp, (self.pc >> 8) & 0x00FF)
+        self.sp -= 1 
        
         # TODO: FINISH THIS  
         
@@ -163,14 +177,20 @@ class CPU:
     
     def ZP0(self): # Zero Page
         self.address = self.read(self.pc)
-        # FINISH 
+        self.data = self.read(self.address) 
+        self.pc += 1 
         return 0 
     
     def ZPX(self): # Zero Page X
-        
+        self.address = (self.read(self.pc) + self.x) % 0x0100
+        self.data = self.read(self.address) 
+        self.pc += 1 
         return 0
     
     def ZPY(self): # Zero Page Y
+        self.address = (self.read(self.pc) + self.y) % 0x0100
+        self.data = self.read(self.address) 
+        self.pc += 1 
         return 0
     
     def REL(self): # Relative
@@ -213,6 +233,7 @@ class CPU:
         return 0
     
     def IND(self): # Indirect 
+        
         return 0
 
     def IZX(self): # Indexed Indirect X
@@ -477,22 +498,34 @@ class CPU:
         return 0
 
     def ORA(self): # Logical Inclusive OR
+        self.a |= self.data
+        self.set_flag(Z, self.a == 0)
+        self.set_flag(N, self.a < 0)
         return 1
 
     def PHA(self): # Push Accumulator
+        self.write(0x0100 + self.sp, self.a)
+        self.sp -= 1
         return 0
 
     def PHP(self): # Push Processor Status
+        self.write(0x0100 + self.sp, self.status)
+        self.sp -= 1
         return 0
 
     def PLA(self): # Pull Accumulator
+        self.sp += 1
+        self.a = self.read(0x0100 + self.sp)
+        self.set_flag(Z, self.a == 0)
+        self.set_flag(N, self.a < 0)
         return 0
 
     def PLP(self): # Pull Processor Status
+        self.sp += 1
+        self.status = self.read(0x0100 + self.sp)
         return 0
 
     def ROL(self, is_acc: bool = False): # Rotate Left
-        
         return 0
 
     def ROR(self, is_acc: bool = False): # Rotate Right
@@ -505,6 +538,7 @@ class CPU:
         return 0
 
     def SBC(self): # Subtract with Carry
+    
         return 1
 
     def SEC(self): # Set Carry Flag
@@ -544,7 +578,7 @@ class CPU:
         return 0
 
     def TSX(self): # Transfer Stack Pointer to X
-        self.x = self.stkp
+        self.x = self.sp
         self.set_flag(N, self.x < 0)
         self.set_flag(Z, self.x == 0)
         return 0
@@ -556,7 +590,7 @@ class CPU:
         return 0
 
     def TXS(self): # Transfer X to Stack Pointer
-        self.stkp = self.x
+        self.sp = self.x
         return 0
 
     def TYA(self): # Transfer Y to Accumulator
@@ -627,11 +661,11 @@ class CPU:
         return 0
     
     def print_registers(self):
-        print("A:  {:04x}".format(self.a), end="\t")
-        print("X:  {:04x}".format(self.x), end="\t")
-        print("Y:  {:04x}".format(self.y))
+        print(" A: {:04x}".format(self.a), end="\t")
+        print(" X: {:04x}".format(self.x), end="\t")
+        print(" Y: {:04x}".format(self.y))
         print("PC: {:04x}".format(self.pc), end="\t")
-        print("SP: {:04x}".format(self.stkp), end="\t")
+        print("SP: {:04x}".format(self.sp), end="\t")
 
         print("Status:", end=" ")
         print(*(int(self.get_flag(2**i)) for i in range(8)), end="\n", sep="")
