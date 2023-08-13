@@ -134,7 +134,6 @@ class CPU:
         cycles = 7
         self.write(0x0100 + self.sp, (self.pc >> 8) & 0x00FF)
         self.sp -= 1 
-       
         # TODO: FINISH THIS  
         
         return 0
@@ -233,7 +232,6 @@ class CPU:
         return 0
     
     def IND(self): # Indirect 
-        
         return 0
 
     def IZX(self): # Indexed Indirect X
@@ -669,8 +667,3 @@ class CPU:
 
         print("Status:", end=" ")
         print(*(int(self.get_flag(2**i)) for i in range(8)), end="\n", sep="")
-        
-        
-            
-    
-    
