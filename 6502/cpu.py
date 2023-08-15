@@ -210,9 +210,13 @@ class CPU:
         
         Also stores the data in the calculated memory address
         """
-        self.address = self.read(self.pc) | (self.read(self.pc + 1) << 8)
+        
+        addr_lo = self.read(self.pc)
+        self.pc += 1
+        addr_hi = self.read(self.pc)
+        self.pc += 1
+        self.address = addr_lo + (addr_hi << 8)
         self.data = self.read(self.address)
-        self.pc += 2
         return 0
     
     def ABX(self): # Absolute X THIS ONE IS MORE COMPLICATED CLOCKS
@@ -244,10 +248,11 @@ class CPU:
         return 0
 
     def IZX(self): # Indexed Indirect X
-        addr_lo = self.read(self.pc) + self.x
+        addr = self.read(self.pc) + self.x
+        addr_lo = self.read(addr)
         self.pc += 1
-        addr_hi = addr_lo + 1   
-      
+        addr_hi = self.read(addr + 1)
+    
         self.address = addr_lo + (addr_hi <<  8)
         self.data = self.read(self.address)
         
@@ -274,10 +279,10 @@ class CPU:
     # This along with the return value of the addressing mode function
     # determines how many cycles to add to the total cycle count.
 
-    
+
     def ADC(self): # Add with Carry
 
-        value = self.data + (self.get_flag(C) << 8)
+        value = self.a + self.data + (self.get_flag(C) << 8)
         if value >= 256:
             self.set_flag(C, True)
         else:  

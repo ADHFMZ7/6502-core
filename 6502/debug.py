@@ -9,15 +9,18 @@ def main():
     bus = BUS()
     cpu = CPU(bus) 
          
-    bus.load_rom("../nestest.nes", 0x8000) 
-    
+    bus.load_rom("s.bin", 0x0600) 
+
+    cpu.pc = 0x0600
+
     print("6502 Debugger")
     
     #bus.dump_memory_range(0x8000, 0x8100)
         
+    bus.dump_memory_at_addr(cpu.pc)
     while 1:
         # print(f"{hex(cpu.address)} {hex(cpu.data)} {bus.r}")
-        bus.dump_memory_at_addr(cpu.pc)
+        #bus.dump_memory_at_addr(cpu.pc)
         inp = input("\033[31m>>>\033[0m ")
         if inp: 
             command = inp
@@ -27,12 +30,14 @@ def main():
             print_help()
         elif command in ["n", "next"]:
             cpu.clock()
+            cpu.print_registers()
         elif command in ["p", "print"]:
             cpu.print_registers()
         elif command[0] in ["d", "display"]: 
             try:
                 address = int(command.split()[1], 16)
                 bus.dump_memory_at_addr(address)
+                continue
             except:
                 print("Invalid address")
         elif command in ["q", "quit"]:
@@ -48,7 +53,8 @@ def main():
         else:
             print("Invalid command")
             print("Type 'h' or 'help' for full list of commands")
-                
+             
+        bus.dump_memory_at_addr(cpu.pc)
 
 def print_help():
     print("h, help: print this help message")
