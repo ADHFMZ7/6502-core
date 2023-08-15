@@ -1,6 +1,6 @@
 from bus import BUS
 
-# TODO: Stack ops and Interrupts
+# TODO: Interrupts
 #       In the future; illegal ops
 
 # C = 1  # Carry
@@ -530,9 +530,20 @@ class CPU:
         return 0
 
     def RTI(self): # Return from Interrupt
+        self.sp += 1
+        self.status = self.read(0x0100 + self.sp)
+        self.sp += 1
+        self.pc =  self.read(0x0100 + self.sp)
+        self.sp += 1
+        self.pc += self.read(0x0100 + self.sp) << 8
         return 0
+    
 
     def RTS(self): # Return from Subroutine
+        self.sp += 1
+        self.pc =  self.read(0x0100 + self.sp)
+        self.sp += 1
+        self.pc += self.read(0x0100 + self.sp) << 8
         return 0
 
     def SBC(self): # Subtract with Carry
