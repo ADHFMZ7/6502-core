@@ -2,14 +2,13 @@ MEMORY_SIZE = 64 * 1024
 
 class BUS:
 
-    def __init__(self):
+    def __init__(self, reset_vector: int = 0x8000):
         self.memory = [0xea] * MEMORY_SIZE 
-        self.memory[0xFFFC] = 0x00
-        self.memory[0xFFFD] = 0x80
+        self.memory[0xFFFC] = reset_vector & 0x00FF 
+        self.memory[0xFFFD] = reset_vector & 0xFF00
         
         self.data = 0x0
         self.address = 0x0
-        self.r = 1 
        
     def read(self, address: int):
         return self.memory[address]
