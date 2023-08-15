@@ -127,7 +127,7 @@ class CPU:
         self.a = 0 
         self.x = 0
         self.y = 0
-        self.sp = 0xFD
+        self.sp = 0xFF
         self.status = 0x00 | U
 
     def irq(self):
@@ -232,13 +232,35 @@ class CPU:
         return 0
     
     def IND(self): # Indirect 
+        addr_lo = self.read(self.pc)
+        self.pc += 1
+        addr_hi = self.read(self.pc)
+        self.pc += 1
+        
+        ind_addr = addr_lo + (addr_hi << 8)
+        self.address = (self.read(ind_addr)) + (self.read(ind_addr) << 8)
+        self.data = self.read(self.address)
+
         return 0
 
     def IZX(self): # Indexed Indirect X
-        self.address
+        addr_lo = self.read(self.pc) + self.x
+        self.pc += 1
+        addr_hi = addr_lo + 1   
+      
+        self.address = addr_lo + (addr_hi <<  8)
+        self.data = self.read(self.address)
+        
         return 0
     
     def IZY(self): # Indirect Indexed Y
+        # TODO: This one is a bit different with carry bit?
+        addr_lo = self.read(self.pc) + self.y
+        self.pc += 1
+        addr_hi = addr_lo + 1   
+      
+        self.address = addr_lo + (addr_hi <<  8)
+        self.data = self.read(self.address) 
         return 1
    
 
@@ -288,7 +310,7 @@ class CPU:
     def BCC(self): # Branch if Carry Clear
         
         if not self.get_flag(C):
-            pc = self.address
+            self.pc = self.address
             return 2
          
         return 1
@@ -296,7 +318,7 @@ class CPU:
     def BCS(self): # Branch if Carry Set
        
         if self.get_flag(C):
-            pc = self.address
+            self.pc = self.address
             return 2
         
         return 1
@@ -304,18 +326,17 @@ class CPU:
     def BEQ(self): # Branch if Equal
         
         if self.get_flag(Z):
-            pc = self.address
+            self.pc = self.address
             return 2
         
         return 1 
 
     def BIT(self): # Bit Test
-       
-        #TODO:  FINISH THIS   
+        value = self.a & self.read(self.data) 
         
-        # self.set_flag(N)
-        # self.set_flag(V)
-        # self.set_flag(Z)
+        self.set_flag(N, self.read(self.data) < 0)
+        self.set_flag(V, 0 != (0b01000000 & self.read(self.data)) )
+        self.set_flag(Z, value == 0)
         return 0
 
     def BMI(self): # Branch if Minus
@@ -343,6 +364,7 @@ class CPU:
         return 1
 
     def BRK(self): # Force Interrupt
+        # TODO: This
         return 0
 
     def BVC(self): # Branch if Overflow Clear
@@ -454,13 +476,15 @@ class CPU:
         return 0
 
     def JMP(self): # Jump
-        # TODO: Double check this is correct 
-        self.pc = self.address 
-      
+        self.pc = self.data
         return 0
 
     def JSR(self): # Jump to Subroutine
-        # TODO: THIS
+        
+        self.write(0x0100 + self.sp, self.pc & 0xFF00) # HIGH
+        self.write(0x0100 + self.sp, self.pc & 0x00FF) # LOW
+        
+        self.pc = self.data
         return 0
 
     def LDA(self): # Load Accumulator
@@ -541,7 +565,7 @@ class CPU:
 
     def RTS(self): # Return from Subroutine
         self.sp += 1
-        self.pc =  self.read(0x0100 + self.sp)
+        self.pc =  self.read(0x0100 + self.sp) 
         self.sp += 1
         self.pc += self.read(0x0100 + self.sp) << 8
         return 0
