@@ -60,7 +60,7 @@ def print_help():
     print("h, help: print this help message")
     print("n, next: execute next instruction")
     print("p, print: print cpu state")
-    print("d, display: display memory")
+    print("d [address], display: display memory at address")
     print("q, quit: quit debugger")
     
 

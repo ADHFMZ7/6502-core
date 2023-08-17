@@ -21,28 +21,10 @@ class CPU:
     This class represents the 6502 CPU. It connects to the bus via the data and address lines.
     """
 
-
     def __init__(self, bus: BUS):
         # Connected BUS device
         self.bus = bus 
       
-    # def reset(self):
-    #     # Load reset vector
-    #     self.pc = self.read(0xFFFC) | (self.read(0xFFFD) << 8) 
-    #     # Initialize registers
-    #     self.a = 0 
-    #     self.x = 0
-    #     self.y = 0
-    #     self.sp = 0xFD
-    #     self.status = 0x00 | U 
-       
-        # Registers
-        # self.a = 0
-        # self.x = 0
-        # self.y = 0
-        # self.sp = 0
-        # self.pc = 0 
-        # self.status = 0 | U
         self.reset()
 
         # Internal Helpers 
@@ -156,13 +138,13 @@ class CPU:
     def get_flag(self, flag: int):
         return (self.status & flag) > 0  
 
-
     # Addressing Modes
     # These addressing mode functions place the data that will be
     # operated on in the self.data variable.
     
     # The functions return how many possible extra cycles the instruction
-    # could take.  
+    # could take. This is currently not working. CPU will be clock accurate in a 
+    # future iteration
     
     def IMP(self): # Implied
         return 0
