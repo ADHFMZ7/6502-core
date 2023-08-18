@@ -26,7 +26,7 @@ class CPU:
         self.bus = bus 
       
         self.reset()
-
+        print("POST RESET IT IS: ", self.pc)
         # Internal Helpers 
         self.data = 0
         self.address = 0
@@ -59,7 +59,6 @@ class CPU:
         executes it and decrements the number of cycles left for the current 
         instruction. 
         """
-        
         op, mode, cycles = self.fetch()
         self.execute(op, mode, cycles)
         return
@@ -69,7 +68,10 @@ class CPU:
         Fetches the next instruction from memory and returns the opcode, 
         addressing mode and base cycles.
         """
+        print("running fetch")
         self.address = self.pc 
+        print("FETCH: ", self.pc)
+        print()
         return self.lookup[self.read(self.pc)]
 
     def execute(self, op: callable, mode: callable, cycles: int):
@@ -192,13 +194,16 @@ class CPU:
         
         Also stores the data in the calculated memory address
         """
-        
+         
         addr_lo = self.read(self.pc)
         self.pc += 1
         addr_hi = self.read(self.pc)
         self.pc += 1
-        self.address = addr_lo + (addr_hi << 8)
+        self.address = addr_lo | (addr_hi << 8)
         self.data = self.read(self.address)
+        print("SELF.LO", hex(addr_lo))
+        print("SELF.hi", hex(addr_hi))
+        print("SELF.DATA", hex(self.address))
         return 0
     
     def ABX(self): # Absolute X THIS ONE IS MORE COMPLICATED CLOCKS
@@ -225,7 +230,7 @@ class CPU:
         
         ind_addr = addr_lo + (addr_hi << 8)
         self.address = (self.read(ind_addr)) + (self.read(ind_addr) << 8)
-        self.data = self.read(self.address)
+        self.address = self.read(self.address)
 
         return 0
 
@@ -463,7 +468,7 @@ class CPU:
         return 0
 
     def JMP(self): # Jump
-        self.pc = self.data
+        self.pc = self.address
         return 0
 
     def JSR(self): # Jump to Subroutine

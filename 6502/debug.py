@@ -7,14 +7,13 @@ import curses
 
 def main():
     bus = BUS()
-    cpu = CPU(bus) 
-         
-    bus.load_rom("s.bin", 0x0600) 
+    bus.load_rom("tests/6502_functional_test.bin", 0x0000) 
 
-    cpu.pc = 0x0600
+    cpu = CPU(bus) 
+    # cpu.pc = 0x0600
 
     print("6502 Debugger")
-    
+    print("LOOK HERE", cpu.pc)    
     #bus.dump_memory_range(0x8000, 0x8100)
         
     bus.dump_memory_at_addr(cpu.pc)
