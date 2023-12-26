@@ -3,7 +3,8 @@ MEMORY_SIZE = 64 * 1024
 class BUS:
 
     def __init__(self):
-        self.memory = [0xea] * MEMORY_SIZE 
+        #self.memory = [0xea] * MEMORY_SIZE 
+        self.memory = [0x0] * MEMORY_SIZE 
         
         self.data = 0x0
         self.address = 0x0
@@ -18,10 +19,8 @@ class BUS:
         return self.memory[byte + 1]
 
     def dump_memory(self, start_addr: int = 0):
-        # if start_addr % 16:
-        #     start = start_adr - start % 16
-        start = start_addr if not start_addr % 16 else start_addr - start_addr % 16
 
+        start = start_addr & 0b11110000
         for offset, data in enumerate(self.memory[start:]):
             addr = start + offset
             if not addr % 16:

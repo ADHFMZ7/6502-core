@@ -26,7 +26,6 @@ class CPU:
         self.bus = bus 
       
         self.reset()
-        print("POST RESET IT IS: ", self.pc)
         # Internal Helpers 
         self.data = 0
         self.address = 0
@@ -68,10 +67,7 @@ class CPU:
         Fetches the next instruction from memory and returns the opcode, 
         addressing mode and base cycles.
         """
-        print("running fetch")
         self.address = self.pc 
-        print("FETCH: ", self.pc)
-        print()
         return self.lookup[self.read(self.pc)]
 
     def execute(self, op: callable, mode: callable, cycles: int):
@@ -201,9 +197,6 @@ class CPU:
         self.pc += 1
         self.address = addr_lo | (addr_hi << 8)
         self.data = self.read(self.address)
-        print("SELF.LO", hex(addr_lo))
-        print("SELF.hi", hex(addr_hi))
-        print("SELF.DATA", hex(self.address))
         return 0
     
     def ABX(self): # Absolute X THIS ONE IS MORE COMPLICATED CLOCKS

@@ -3,7 +3,7 @@ from bus import BUS
 
 
 def main():
-    bus = BUS(reset_vector = 0x8000)
+    bus = BUS()
     cpu = CPU(bus) 
     print("IT STARTS AT: ", cpu.pc) 
     bus.load_rom("../nestest.nes", 0x8000) 
